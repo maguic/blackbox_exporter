@@ -107,6 +107,8 @@ func probeHandler(w http.ResponseWriter, r *http.Request, c *config.Config, logg
 		http.Error(w, "Target parameter is missing", http.StatusBadRequest)
 		return
 	}
+	
+	privateIp := params.Get("internal")
 
 	prober, ok := Probers[module.Prober]
 	if !ok {
@@ -126,9 +128,9 @@ func probeHandler(w http.ResponseWriter, r *http.Request, c *config.Config, logg
 	probeDurationGauge.Set(duration)
 	if success {
 		probeSuccessGauge.Set(1)
-		level.Info(sl).Log("msg", "Probe succeeded", "duration_seconds", duration)
+		level.Info(sl).Log("msg", "Probe succeeded", "duration_seconds", duration, "privateIp",privateIp)
 	} else {
-		level.Error(sl).Log("msg", "Probe failed", "duration_seconds", duration)
+		level.Error(sl).Log("msg", "Probe failed", "duration_seconds", duration, "privateIp",privateIp)
 	}
 
 	debugOutput := DebugOutput(&module, &sl.buffer, registry)
